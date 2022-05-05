@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
-import { kotuQuery, Morpheme } from "../queries";
+import { useMutation, useQuery } from "react-query";
+import { addSentence, kotuQuery, Morpheme } from "../queries";
 
 export const Mining = () => {
   const [clip, setClip] = useState("");
@@ -13,6 +13,7 @@ export const Mining = () => {
   const [tags, setTags] = useState<string[]>(
     (localStorage.getItem("tags") ?? "").trim().split(/\s+/)
   );
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const { data: kotuData, status: kotuStatus } = useQuery(
     ["kotu", clip],
@@ -25,6 +26,22 @@ export const Mining = () => {
       },
     }
   );
+
+  const { mutate: addSentenceMutation, status: addSentenceStatus } =
+    useMutation(
+      (params: {
+        dictionaryForm: string;
+        reading: string;
+        sentence: string;
+        tags: string[];
+      }) =>
+        addSentence(
+          params.dictionaryForm,
+          params.reading,
+          params.sentence,
+          params.tags
+        )
+    );
 
   useEffect(() => {
     let lastClipboardEntry: string | null = null;
@@ -70,9 +87,33 @@ export const Mining = () => {
     },
     [selectedKeys]
   );
+  const onMineButtonPressed = useCallback(() => {
+    const dictionaryForm = selectedMorpheme?.dictionaryForm ?? "";
+    const reading = selectedMorpheme?.dictionaryFormReading ?? "";
+    const sentence = morphemes.map((morpheme) => morpheme.surface).join("");
+
+    addSentenceMutation(
+      {
+        dictionaryForm,
+        reading,
+        sentence,
+        tags,
+      },
+      {
+        onError: () => {
+          setLastError("Unexpected error occured.");
+        },
+        onSuccess: () => {
+          setLastError(null);
+          setSelectedKeys([]);
+        },
+      }
+    );
+  }, [addSentenceMutation, selectedMorpheme, tags, morphemes]);
 
   return (
     <>
+      {lastError && <p style={{ color: "red" }}>{lastError}</p>}
       Tags:
       <input
         style={{ marginLeft: "10px" }}
@@ -140,7 +181,12 @@ export const Mining = () => {
           <br />
           <button
             style={{ ...styles.button, width: "200px" }}
-            disabled={!selectedMorpheme}
+            disabled={
+              !selectedMorpheme ||
+              kotuStatus === "loading" ||
+              addSentenceStatus === "loading"
+            }
+            onClick={onMineButtonPressed}
           >
             Mine!
           </button>
