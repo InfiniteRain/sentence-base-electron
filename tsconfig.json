@@ -4,7 +4,6 @@
     "module": "commonjs",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "noImplicitAny": true,
     "sourceMap": true,
     "baseUrl": ".",
     "outDir": "dist",
@@ -13,7 +12,9 @@
     "paths": {
       "*": ["node_modules/*"]
     },
-    "jsx": "react"
+    "jsx": "react",
+    "downlevelIteration": true,
+    "strict": true
   },
   "include": ["src/**/*"]
 }

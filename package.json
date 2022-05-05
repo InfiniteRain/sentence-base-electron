@@ -59,7 +59,8 @@
                   }
                 }
               ]
-            }
+            },
+            "devContentSecurityPolicy": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';"
           }
         ]
       ]
@@ -93,7 +94,10 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "firebase": "^9.7.0",
     "react": "^18.1.0",
-    "react-dom": "^18.1.0"
+    "react-dom": "^18.1.0",
+    "react-firebaseui": "^6.0.0",
+    "react-query": "^3.38.1"
   }
 }

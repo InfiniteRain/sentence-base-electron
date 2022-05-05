@@ -1,26 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Mining } from "./Mining";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 export const App = () => {
-  const [clip, setClip] = useState("");
-
-  useEffect(() => {
-    let lastClipboardEntry: string | null = null;
-
-    const clipboardInterval = setInterval(async () => {
-      const clipboardEntry = await sentenceBase.getCurrentClipboardEntry();
-
-      if (
-        lastClipboardEntry !== clipboardEntry &&
-        lastClipboardEntry !== null
-      ) {
-        setClip(clipboardEntry);
-      }
-
-      lastClipboardEntry = clipboardEntry;
-    }, 100);
-
-    return () => clearInterval(clipboardInterval);
-  }, []);
-
-  return <p>{clip}</p>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Mining />
+    </QueryClientProvider>
+  );
 };
