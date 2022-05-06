@@ -47,6 +47,10 @@ export const Mining = () => {
     let lastClipboardEntry: string | null = null;
 
     const clipboardInterval = setInterval(async () => {
+      if (selectedKeys.length > 0) {
+        return;
+      }
+
       const clipboardEntry = await sentenceBase.getCurrentClipboardEntry();
 
       if (
@@ -60,7 +64,7 @@ export const Mining = () => {
     }, 100);
 
     return () => clearInterval(clipboardInterval);
-  }, []);
+  }, [selectedKeys]);
   useEffect(() => {
     setSelectedMorphemes(
       (kotuData ?? []).filter((_, index) => selectedKeys.includes(index)).flat()
@@ -141,6 +145,9 @@ export const Mining = () => {
       {morphemes.length > 0 && (
         <>
           <hr />
+          <button style={styles.button} onClick={() => setSelectedKeys([])}>
+            X
+          </button>
           {morphemes.map((morpheme, index) => (
             <button
               key={index}
